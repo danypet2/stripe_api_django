@@ -1,0 +1,63 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'item/styles/item.css' %}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <title>Document</title>
+</head>
+<body>
+<div>
+    <div class="container">
+        <h1>Карточка товара</h1>
+        <p>Название: {{items.name}}</p>
+        <p>Описание: {{items.description}}</p>
+        <p>Цена: {{items.price}} р.</p>
+        <button class="custom-btn btn-3" id="checkout-button"> <span>Купить</span></button>
+        {% csrf_token %}
+
+
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
+
+    let checkoutButton = document.getElementById("checkout-button");
+    checkoutButton.addEventListener("click", function () {
+        fetch("{% url 'create-checkout-session' items.id %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({sessionId: session.id});
+            })
+            .then(function (result) {
+                // If redirectToCheckout fails due to a browser or network
+                // error, you should display the localized error message to your
+                // customer using error.message.
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error("Error:", error);
+            });
+    });
+
+
+</script>
+</html>

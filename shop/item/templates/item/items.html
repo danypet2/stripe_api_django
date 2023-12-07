@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'item/styles/item.css' %}">
+</head>
+<body>
+{% for item in items %}
+<div>
+    <div class="container">
+        <h1>Карточка товара</h1>
+        <p>Название: {{item.name}}</p>
+        <p>Описание: {{item.description}}</p>
+        <p>Цена: {{item.price}} р.</p>
+        <form action="sudmit">
+            <button class="custom-btn btn-3" formaction="http://127.0.0.1:8000/item/{{item.pk}}/" id="checkout-button"><span>Купить</span>
+            </button>
+        </form>
+        {% csrf_token %}
+
+
+    </div>
+</div>
+{% endfor %}
+
+
+</body>
+</html>
